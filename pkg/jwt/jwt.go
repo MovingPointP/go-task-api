@@ -35,6 +35,8 @@ func GenerateToken(userID uint) (string, error) {
 		},
 	}
 
+	// 署名方式の決定
+	// HS256: 256バイトの共通鍵
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// エンコード
 	return token.SignedString([]byte(secret))
