@@ -42,7 +42,7 @@ func (r *gormTaskRepository) FindAllByUserID(userID uint) ([]*entity.Task, error
 }
 
 func (r *gormTaskRepository) Update(task *entity.Task) error {
-	return r.db.Updates(task).Error
+	return r.db.Save(task).Error
 }
 
 func (r *gormTaskRepository) Delete(id, userID uint) error {
