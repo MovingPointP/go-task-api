@@ -12,6 +12,7 @@ type gormTaskRepository struct {
 	db *gorm.DB
 }
 
+// コンストラクタ
 func NewTaskRepository(db *gorm.DB) repository.TaskRepository {
 	return &gormTaskRepository{db: db}
 }
