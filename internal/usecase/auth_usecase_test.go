@@ -7,7 +7,7 @@ import (
 	"github.com/MovingPointP/go-task-api/internal/usecase"
 )
 
-func TestAuth_Register(t *testing.T) {
+func TestAuthUsecase_Register(t *testing.T) {
 	os.Setenv("JWT_SECRET", "test-secret")
 	os.Setenv("JWT_EXPIRATION_HOURS", "1")
 
@@ -32,7 +32,7 @@ func TestAuth_Register(t *testing.T) {
 	}
 }
 
-func TestAuth_Login(t *testing.T) {
+func TestAuthUsecase_Login(t *testing.T) {
 	os.Setenv("JWT_SECRET", "test-secret")
 	os.Setenv("JWT_EXPIRATION_HOURS", "1")
 
