@@ -9,11 +9,11 @@ import (
 )
 
 type TaskUsecase interface {
-	CreateTask(userID uint, title, description string) (*entity.Task, error)
-	GetTask(taskID, userID uint) (*entity.Task, error)
-	GetAllTask(userID uint) ([]*entity.Task, error)
-	UpdateTask(taskID, userID uint, title, description string, completed bool) (*entity.Task, error)
-	DeleteTask(taskID, userID uint) error
+	Create(userID uint, title, description string) (*entity.Task, error)
+	Get(taskID, userID uint) (*entity.Task, error)
+	GetAll(userID uint) ([]*entity.Task, error)
+	Update(taskID, userID uint, title, description string, completed bool) (*entity.Task, error)
+	Delete(taskID, userID uint) error
 }
 
 type taskUsecase struct {
@@ -25,7 +25,7 @@ func NewTaskUsecase(taskRepo repository.TaskRepository) TaskUsecase {
 	return &taskUsecase{taskRepo: taskRepo}
 }
 
-func (t *taskUsecase) CreateTask(userID uint, title, description string) (*entity.Task, error) {
+func (t *taskUsecase) Create(userID uint, title, description string) (*entity.Task, error) {
 	task := &entity.Task{
 		UserID:      userID,
 		Title:       title,
@@ -37,7 +37,7 @@ func (t *taskUsecase) CreateTask(userID uint, title, description string) (*entit
 	return task, nil
 }
 
-func (t *taskUsecase) GetTask(taskID, userID uint) (*entity.Task, error) {
+func (t *taskUsecase) Get(taskID, userID uint) (*entity.Task, error) {
 	task, err := t.taskRepo.FindByID(taskID, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task: %w", err)
@@ -48,7 +48,7 @@ func (t *taskUsecase) GetTask(taskID, userID uint) (*entity.Task, error) {
 	return task, nil
 }
 
-func (t *taskUsecase) GetAllTask(userID uint) ([]*entity.Task, error) {
+func (t *taskUsecase) GetAll(userID uint) ([]*entity.Task, error) {
 	tasks, err := t.taskRepo.FindAllByUserID(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tasks: %w", err)
@@ -56,7 +56,7 @@ func (t *taskUsecase) GetAllTask(userID uint) ([]*entity.Task, error) {
 	return tasks, nil
 }
 
-func (t *taskUsecase) UpdateTask(taskID, userID uint, title, description string, completed bool) (*entity.Task, error) {
+func (t *taskUsecase) Update(taskID, userID uint, title, description string, completed bool) (*entity.Task, error) {
 	// タスクの取得
 	task, err := t.taskRepo.FindByID(taskID, userID)
 	if err != nil {
@@ -77,7 +77,7 @@ func (t *taskUsecase) UpdateTask(taskID, userID uint, title, description string,
 	return task, nil
 }
 
-func (t *taskUsecase) DeleteTask(taskID, userID uint) error {
+func (t *taskUsecase) Delete(taskID, userID uint) error {
 	// タスクの取得
 	task, err := t.taskRepo.FindByID(taskID, userID)
 	if err != nil {
