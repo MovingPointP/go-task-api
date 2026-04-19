@@ -37,6 +37,7 @@ type AuthResponse struct {
 
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var req RegisterRequest
+
 	// リクエストボディをバインドしてバリデーション
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -62,6 +63,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var req LoginRequest
 
+	// リクエストボディをバインドしてバリデーション
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
