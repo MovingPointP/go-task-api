@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"errors"
 	"time"
 )
 
@@ -11,3 +12,8 @@ type User struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+var (
+	ErrEmailAlreadyInUse  = errors.New("email already in use")
+	ErrInvalidCredentials = errors.New("invalid email or password")
+)

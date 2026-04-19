@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/MovingPointP/go-task-api/internal/domain/entity"
@@ -31,7 +30,7 @@ func (u *authUsecase) Register(email, password string) (*entity.User, string, er
 		return nil, "", fmt.Errorf("failed to check email: %w", err)
 	}
 	if exsisting != nil {
-		return nil, "", errors.New("email already in use")
+		return nil, "", entity.ErrEmailAlreadyInUse
 	}
 
 	// パスワードのハッシュ化
@@ -65,12 +64,12 @@ func (u *authUsecase) Login(email, password string) (*entity.User, string, error
 		return nil, "", fmt.Errorf("failed to find user: %w", err)
 	}
 	if user == nil {
-		return nil, "", errors.New("invalid email or password")
+		return nil, "", entity.ErrInvalidCredentials
 	}
 
 	// パスワードの検証
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		return nil, "", errors.New("invalid email or password")
+		return nil, "", entity.ErrInvalidCredentials
 	}
 
 	// トークンの生成

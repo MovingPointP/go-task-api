@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/MovingPointP/go-task-api/internal/domain/entity"
 	"github.com/MovingPointP/go-task-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +45,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 
 	user, token, err := h.authUsecase.Register(req.Email, req.Password)
 	if err != nil {
-		if err.Error() == "email already in use" {
+		if errors.Is(err, entity.ErrEmailAlreadyInUse) {
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
@@ -67,7 +69,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 
 	user, token, err := h.authUsecase.Login(req.Email, req.Password)
 	if err != nil {
-		if err.Error() == "invalid email or password" {
+		if errors.Is(err, entity.ErrInvalidCredentials) {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}

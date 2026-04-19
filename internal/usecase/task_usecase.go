@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/MovingPointP/go-task-api/internal/domain/entity"
@@ -43,7 +42,7 @@ func (t *taskUsecase) Get(taskID, userID uint) (*entity.Task, error) {
 		return nil, fmt.Errorf("failed to get task: %w", err)
 	}
 	if task == nil {
-		return nil, errors.New("task not found")
+		return nil, entity.ErrTaskNotFound
 	}
 	return task, nil
 }
@@ -63,7 +62,7 @@ func (t *taskUsecase) Update(taskID, userID uint, title, description string, com
 		return nil, fmt.Errorf("failed to get task: %w", err)
 	}
 	if task == nil {
-		return nil, errors.New("task not found")
+		return nil, entity.ErrTaskNotFound
 	}
 
 	task.Title = title
@@ -84,7 +83,7 @@ func (t *taskUsecase) Delete(taskID, userID uint) error {
 		return fmt.Errorf("failed to get task: %w", err)
 	}
 	if task == nil {
-		return errors.New("task not found")
+		return entity.ErrTaskNotFound
 	}
 
 	// タスクの削除
