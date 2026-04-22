@@ -15,15 +15,17 @@ func TestAuthUsecase_Register(t *testing.T) {
 
 	uc := usecase.NewAuthUsecase(newMockUserRepository())
 
-	// 正常系
-	user, token, err := uc.Register("test@example.com", "test")
-	require.NoError(t, err, "Register failed")
-	assert.Equal(t, "test@example.com", user.Email)
-	assert.NotEmpty(t, token)
+	t.Run("正常系", func(t *testing.T) {
+		user, token, err := uc.Register("test@example.com", "test")
+		require.NoError(t, err, "Register failed")
+		assert.Equal(t, "test@example.com", user.Email)
+		assert.NotEmpty(t, token)
+	})
 
-	// メールアドレスの重複テスト
-	_, _, err = uc.Register("test@example.com", "test")
-	assert.Error(t, err, "expected error for duplicate email, got nil")
+	t.Run("メールアドレスの重複", func(t *testing.T) {
+		_, _, err := uc.Register("test@example.com", "test")
+		assert.Error(t, err, "expected error for duplicate email, got nil")
+	})
 }
 
 func TestAuthUsecase_Login(t *testing.T) {
@@ -32,21 +34,23 @@ func TestAuthUsecase_Login(t *testing.T) {
 
 	uc := usecase.NewAuthUsecase(newMockUserRepository())
 
-	// ユーザー登録
 	_, _, err := uc.Register("login@example.com", "test")
 	require.NoError(t, err, "Register failed")
 
-	// 正常系
-	user, token, err := uc.Login("login@example.com", "test")
-	require.NoError(t, err, "Login failed")
-	assert.Equal(t, "login@example.com", user.Email)
-	assert.NotEmpty(t, token)
+	t.Run("正常系", func(t *testing.T) {
+		user, token, err := uc.Login("login@example.com", "test")
+		require.NoError(t, err, "Login failed")
+		assert.Equal(t, "login@example.com", user.Email)
+		assert.NotEmpty(t, token)
+	})
 
-	// 誤ったパスワードのテスト
-	_, _, err = uc.Login("login@example.com", "wrong")
-	assert.Error(t, err, "expected error for wrong password, got nil")
+	t.Run("誤ったパスワード", func(t *testing.T) {
+		_, _, err := uc.Login("login@example.com", "wrong")
+		assert.Error(t, err, "expected error for wrong password, got nil")
+	})
 
-	// 存在しない場合
-	_, _, err = uc.Login("nobody@example.com", "test")
-	assert.Error(t, err, "expected error for non-exsistent user, got nil")
+	t.Run("存在しないユーザー", func(t *testing.T) {
+		_, _, err := uc.Login("nobody@example.com", "test")
+		assert.Error(t, err, "expected error for non-exsistent user, got nil")
+	})
 }
