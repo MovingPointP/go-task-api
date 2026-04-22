@@ -5,20 +5,17 @@ import (
 
 	"github.com/MovingPointP/go-task-api/internal/domain/entity"
 	"github.com/MovingPointP/go-task-api/internal/infrastructure/persistence"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTaskRepository_Create(t *testing.T) {
 	repo := persistence.NewTaskRepository(setupTestDB(t))
 
 	task := &entity.Task{UserID: 1, Title: "テストタスク", Description: "説明"}
-
-	if err := repo.Create(task); err != nil {
-		t.Fatalf("Create failed: %v", err)
-	}
-
-	if task.ID == 0 {
-		t.Error("expected task.ID to be set after Create")
-	}
+	err := repo.Create(task)
+	require.NoError(t, err, "Create failed")
+	assert.NotZero(t, task.ID)
 }
 
 func TestTaskRepository_FindByID(t *testing.T) {
@@ -29,33 +26,19 @@ func TestTaskRepository_FindByID(t *testing.T) {
 
 	// 存在する場合
 	found, err := repo.FindByID(task.ID, 1)
-	if err != nil {
-		t.Fatalf("FindByID failed: %v", err)
-	}
-	if found == nil {
-		t.Error("expected task, got nil")
-	}
-	if found.Title != "テストタスク" {
-		t.Errorf("expected title テストタスク, got %s", found.Title)
-	}
+	require.NoError(t, err, "FindByID failed")
+	require.NotNil(t, found)
+	assert.Equal(t, "テストタスク", found.Title)
 
 	// 存在しない場合
 	notFound, err := repo.FindByID(9999, 1)
-	if err != nil {
-		t.Fatalf("FindByID failed: %v", err)
-	}
-	if notFound != nil {
-		t.Error("expected nil for non-existent ID")
-	}
+	require.NoError(t, err, "FindByID failed")
+	assert.Nil(t, notFound)
 
 	// 他ユーザーのタスク
 	other, err := repo.FindByID(task.ID, 2)
-	if err != nil {
-		t.Fatalf("FindByID failed: %v", err)
-	}
-	if other != nil {
-		t.Error("expected nil for wrong userID")
-	}
+	require.NoError(t, err, "FindByID failed")
+	assert.Nil(t, other)
 }
 
 func TestTaskRepository_FindAllByUserID(t *testing.T) {
@@ -66,13 +49,8 @@ func TestTaskRepository_FindAllByUserID(t *testing.T) {
 	repo.Create(&entity.Task{UserID: 2, Title: "他ユーザーのタスク"})
 
 	tasks, err := repo.FindAllByUserID(1)
-	if err != nil {
-		t.Fatalf("FindAllByUserID failed: %v", err)
-	}
-
-	if len(tasks) != 2 {
-		t.Errorf("expected 2 tasks for userID=1, got %d", len(tasks))
-	}
+	require.NoError(t, err, "FindAllByUserID failed")
+	assert.Len(t, tasks, 2)
 }
 
 func TestTaskRepository_Update(t *testing.T) {
@@ -84,17 +62,12 @@ func TestTaskRepository_Update(t *testing.T) {
 	task.Title = "更新後のタイトル"
 	task.Completed = true
 
-	if err := repo.Update(task); err != nil {
-		t.Fatalf("Update failed: %v", err)
-	}
+	err := repo.Update(task)
+	require.NoError(t, err, "Update failed")
 
 	updated, _ := repo.FindByID(task.ID, 1)
-	if updated.Title != "更新後のタイトル" {
-		t.Errorf("expected 更新後のタイトル, got %s", updated.Title)
-	}
-	if !updated.Completed {
-		t.Error("expected Completed to be true after Update")
-	}
+	assert.Equal(t, "更新後のタイトル", updated.Title)
+	assert.True(t, updated.Completed)
 }
 
 func TestTaskRepository_Delete(t *testing.T) {
@@ -103,12 +76,9 @@ func TestTaskRepository_Delete(t *testing.T) {
 	task := &entity.Task{UserID: 1, Title: "削除するタスク"}
 	repo.Create(task)
 
-	if err := repo.Delete(task.ID, 1); err != nil {
-		t.Fatalf("Delete failed: %v", err)
-	}
+	err := repo.Delete(task.ID, 1)
+	require.NoError(t, err, "Delete failed")
 
 	deleted, _ := repo.FindByID(task.ID, 1)
-	if deleted != nil {
-		t.Error("expected nil after Delete")
-	}
+	assert.Nil(t, deleted)
 }

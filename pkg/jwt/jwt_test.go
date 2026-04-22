@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/MovingPointP/go-task-api/pkg/jwt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateAndParseToken(t *testing.T) {
@@ -13,30 +15,20 @@ func TestGenerateAndParseToken(t *testing.T) {
 
 	// トークン生成
 	token, err := jwt.GenerateToken(1)
-	if err != nil {
-		t.Fatalf("GenerateToken failed: %v", err)
-	}
-	if token == "" {
-		t.Fatal("expected non-empty token")
-	}
+	require.NoError(t, err, "GenerateToken failed")
+	require.NotEmpty(t, token)
 
 	// トークン復元
 	claims, err := jwt.ParseToken(token)
-	if err != nil {
-		t.Fatalf("ParseToken failed: %v", err)
-	}
-	if claims.UserID != 1 {
-		t.Errorf("expected UserID 1, got %d", claims.UserID)
-	}
+	require.NoError(t, err, "ParseToken failed")
+	assert.Equal(t, uint(1), claims.UserID)
 }
 
 func TestParseToken_InvalidToken(t *testing.T) {
 	os.Setenv("JWT_SECRET", "test-secret-key-for-unit-test")
 
 	_, err := jwt.ParseToken("invalid token")
-	if err == nil {
-		t.Error("expected error for invalid token, got nil")
-	}
+	assert.Error(t, err, "expected error for invalid token, got nil")
 }
 
 func TestParseToken_WrongSecret(t *testing.T) {
@@ -45,7 +37,5 @@ func TestParseToken_WrongSecret(t *testing.T) {
 
 	os.Setenv("JWT_SECRET", "secret-b")
 	_, err := jwt.ParseToken(token)
-	if err == nil {
-		t.Error("expected error for token signed with different secret, got nil")
-	}
+	assert.Error(t, err, "expected error for token signed with different secret, got nil")
 }

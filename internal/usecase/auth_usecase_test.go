@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/MovingPointP/go-task-api/internal/usecase"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAuthUsecase_Register(t *testing.T) {
@@ -15,21 +17,13 @@ func TestAuthUsecase_Register(t *testing.T) {
 
 	// 正常系
 	user, token, err := uc.Register("test@example.com", "test")
-	if err != nil {
-		t.Fatalf("Register failed")
-	}
-	if user.Email != "test@example.com" {
-		t.Errorf("expected email test@example.com, got %s", user.Email)
-	}
-	if token == "" {
-		t.Error("expected non-empty token")
-	}
+	require.NoError(t, err, "Register failed")
+	assert.Equal(t, "test@example.com", user.Email)
+	assert.NotEmpty(t, token)
 
 	// メールアドレスの重複テスト
 	_, _, err = uc.Register("test@example.com", "test")
-	if err == nil {
-		t.Error("expected error for duplicate email, got nil")
-	}
+	assert.Error(t, err, "expected error for duplicate email, got nil")
 }
 
 func TestAuthUsecase_Login(t *testing.T) {
@@ -40,31 +34,19 @@ func TestAuthUsecase_Login(t *testing.T) {
 
 	// ユーザー登録
 	_, _, err := uc.Register("login@example.com", "test")
-	if err != nil {
-		t.Fatalf("Register failed: %v", err)
-	}
+	require.NoError(t, err, "Register failed")
 
 	// 正常系
 	user, token, err := uc.Login("login@example.com", "test")
-	if err != nil {
-		t.Fatalf("Login failed: %v", err)
-	}
-	if user.Email != "login@example.com" {
-		t.Errorf("expected email login@example.com, got %s", user.Email)
-	}
-	if token == "" {
-		t.Error("expected non-empty token")
-	}
+	require.NoError(t, err, "Login failed")
+	assert.Equal(t, "login@example.com", user.Email)
+	assert.NotEmpty(t, token)
 
 	// 誤ったパスワードのテスト
 	_, _, err = uc.Login("login@example.com", "wrong")
-	if err == nil {
-		t.Error("expected error for wrong password, got nil")
-	}
+	assert.Error(t, err, "expected error for wrong password, got nil")
 
 	// 存在しない場合
 	_, _, err = uc.Login("nobody@example.com", "test")
-	if err == nil {
-		t.Error("expected error for non-exsistent user, got nil")
-	}
+	assert.Error(t, err, "expected error for non-exsistent user, got nil")
 }
