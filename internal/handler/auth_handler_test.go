@@ -13,6 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newAuthContext(method, url, body string) (*gin.Context, *httptest.ResponseRecorder) {
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request, _ = http.NewRequest(method, url, strings.NewReader(body))
+	ctx.Request.Header.Set("Content-Type", "application/json")
+	return ctx, w
+}
+
 func TestAuthHandler_Register(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -27,14 +35,8 @@ func TestAuthHandler_Register(t *testing.T) {
 				nil,
 			))
 
-		// テスト用コンテキスト設定
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
-		// リクエストの作成
 		body := `{"email":"` + email + `", "password":"` + password + `"}`
-		ctx.Request, _ = http.NewRequest("POST", "/register", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/register", body)
 
 		h.Register(ctx)
 
@@ -47,12 +49,7 @@ func TestAuthHandler_Register(t *testing.T) {
 			NewMockAuthUsecase(nil, "", entity.ErrEmailAlreadyInUse),
 		)
 
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
-		body := `{"email":"duplicate@example.com", "password":"password123"}`
-		ctx.Request, _ = http.NewRequest("POST", "/register", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/register", `{"email":"duplicate@example.com", "password":"password123"}`)
 
 		h.Register(ctx)
 
@@ -65,12 +62,7 @@ func TestAuthHandler_Register(t *testing.T) {
 			NewMockAuthUsecase(nil, "", errors.New("unexpected error")),
 		)
 
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
-		body := `{"email":"test@example.com", "password":"password123"}`
-		ctx.Request, _ = http.NewRequest("POST", "/register", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/register", `{"email":"test@example.com", "password":"password123"}`)
 
 		h.Register(ctx)
 
@@ -93,12 +85,8 @@ func TestAuthHandler_Login(t *testing.T) {
 				nil,
 			))
 
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
 		body := `{"email":"` + email + `", "password":"` + password + `"}`
-		ctx.Request, _ = http.NewRequest("POST", "/login", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/login", body)
 
 		h.Login(ctx)
 
@@ -111,12 +99,7 @@ func TestAuthHandler_Login(t *testing.T) {
 			NewMockAuthUsecase(nil, "", entity.ErrInvalidCredentials),
 		)
 
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
-		body := `{"email":"test@example.com", "password":"wrongpassword"}`
-		ctx.Request, _ = http.NewRequest("POST", "/login", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/login", `{"email":"test@example.com", "password":"wrongpassword"}`)
 
 		h.Login(ctx)
 
@@ -129,12 +112,7 @@ func TestAuthHandler_Login(t *testing.T) {
 			NewMockAuthUsecase(nil, "", errors.New("unexpected error")),
 		)
 
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
-
-		body := `{"email":"test@example.com", "password":"password123"}`
-		ctx.Request, _ = http.NewRequest("POST", "/login", strings.NewReader(body))
-		ctx.Request.Header.Set("Content-Type", "application/json")
+		ctx, w := newAuthContext("POST", "/login", `{"email":"test@example.com", "password":"password123"}`)
 
 		h.Login(ctx)
 
