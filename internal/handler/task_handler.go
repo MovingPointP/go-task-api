@@ -30,7 +30,7 @@ type UpdateTaskRequest struct {
 }
 
 func getUserID(ctx *gin.Context) uint {
-	return ctx.MustGet("userID").(uint)
+	return ctx.MustGet("UserID").(uint)
 }
 
 // @Summary     タスク作成

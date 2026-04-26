@@ -27,7 +27,7 @@ func newTaskContext(method, url, body string) (*gin.Context, *httptest.ResponseR
 		req, _ = http.NewRequest(method, url, nil)
 	}
 	ctx.Request = req
-	ctx.Set("userID", testUserID)
+	ctx.Set("UserID", testUserID)
 	return ctx, w
 }
 
