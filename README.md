@@ -2,6 +2,10 @@
 
 Go + Gin + Supabase で構築するタスク管理 REST API。
 
+## デプロイ
+
+https://go-task-api-tqmf.onrender.com/swagger/index.html
+
 ## 技術スタック
 
 | カテゴリ | 技術 |
