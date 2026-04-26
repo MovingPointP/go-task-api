@@ -33,6 +33,17 @@ func getUserID(ctx *gin.Context) uint {
 	return ctx.MustGet("userID").(uint)
 }
 
+// @Summary     タスク作成
+// @Description 新しいタスクを作成する
+// @Tags        tasks
+// @Security    BearerAuth
+// @Accept      json
+// @Produce     json
+// @Param       body body CreateTaskRequest true "タスク情報"
+// @Success     201 {object} entity.Task
+// @Failure     400 {object} map[string]string
+// @Failure     500 {object} map[string]string
+// @Router      /tasks [post]
 func (h *TaskHandler) CreateTask(ctx *gin.Context) {
 	var req CreateTaskRequest
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -49,6 +60,14 @@ func (h *TaskHandler) CreateTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, task)
 }
 
+// @Summary     タスク一覧取得
+// @Description ログインユーザーのタスクを全件取得する
+// @Tags        tasks
+// @Security    BearerAuth
+// @Produce     json
+// @Success     200 {array} entity.Task
+// @Failure     500 {object} map[string]string
+// @Router      /tasks [get]
 func (h *TaskHandler) GetTasks(ctx *gin.Context) {
 	tasks, err := h.taskUsecase.GetAll(getUserID(ctx))
 	if err != nil {
@@ -59,6 +78,16 @@ func (h *TaskHandler) GetTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, tasks)
 }
 
+// @Summary     タスク取得
+// @Description 指定 ID のタスクを取得する
+// @Tags        tasks
+// @Security    BearerAuth
+// @Produce     json
+// @Param       id path int true "タスクID"
+// @Success     200 {object} entity.Task
+// @Failure     400 {object} map[string]string
+// @Failure     404 {object} map[string]string
+// @Router      /tasks/{id} [get]
 func (h *TaskHandler) GetTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
@@ -75,6 +104,18 @@ func (h *TaskHandler) GetTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, task)
 }
 
+// @Summary     タスク更新
+// @Description 指定 ID のタスクを更新する
+// @Tags        tasks
+// @Security    BearerAuth
+// @Accept      json
+// @Produce     json
+// @Param       id   path int               true "タスクID"
+// @Param       body body UpdateTaskRequest true "更新情報"
+// @Success     200 {object} entity.Task
+// @Failure     400 {object} map[string]string
+// @Failure     404 {object} map[string]string
+// @Router      /tasks/{id} [put]
 func (h *TaskHandler) UpdateTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
@@ -97,6 +138,16 @@ func (h *TaskHandler) UpdateTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, task)
 }
 
+// @Summary     タスク削除
+// @Description 指定 ID のタスクを削除する
+// @Tags        tasks
+// @Security    BearerAuth
+// @Produce     json
+// @Param       id path int true "タスクID"
+// @Success     204
+// @Failure     400 {object} map[string]string
+// @Failure     404 {object} map[string]string
+// @Router      /tasks/{id} [delete]
 func (h *TaskHandler) DeleteTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {

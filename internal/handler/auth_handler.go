@@ -35,6 +35,17 @@ type AuthResponse struct {
 	Email string `json:"email"`
 }
 
+// @Summary     ユーザー登録
+// @Description メールアドレスとパスワードでユーザーを新規登録し、JWTを返す
+// @Tags        auth
+// @Accept      json
+// @Produce     json
+// @Param       body body RegisterRequest true "登録情報"
+// @Success     201 {object} AuthResponse
+// @Failure     400 {object} map[string]string
+// @Failure     409 {object} map[string]string
+// @Failure     500 {object} map[string]string
+// @Router      /auth/register [post]
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var req RegisterRequest
 
@@ -60,6 +71,17 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	})
 }
 
+// @Summary     ログイン
+// @Description メールアドレスとパスワードでログインし、JWTを返す
+// @Tags        auth
+// @Accept      json
+// @Produce     json
+// @Param       body body LoginRequest true "ログイン情報"
+// @Success     200 {object} AuthResponse
+// @Failure     400 {object} map[string]string
+// @Failure     401 {object} map[string]string
+// @Failure     500 {object} map[string]string
+// @Router      /auth/login [post]
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var req LoginRequest
 
