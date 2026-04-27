@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -132,6 +133,16 @@ func TestTaskHandler_GetTask(t *testing.T) {
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
+
+	t.Run("DBエラー", func(t *testing.T) {
+		h := handler.NewTaskHandler(&errTaskUsecase{err: errors.New("db error")})
+
+		ctx, w := newTaskContext("GET", "/tasks/1", "")
+		ctx.Params = gin.Params{{Key: "id", Value: "1"}}
+		h.GetTask(ctx)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 }
 
 func TestTaskHandler_UpdateTask(t *testing.T) {
@@ -186,6 +197,16 @@ func TestTaskHandler_UpdateTask(t *testing.T) {
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
+
+	t.Run("DBエラー", func(t *testing.T) {
+		h := handler.NewTaskHandler(&errTaskUsecase{err: errors.New("db error")})
+
+		ctx, w := newTaskContext("PUT", "/tasks/1", `{"title":"タイトル"}`)
+		ctx.Params = gin.Params{{Key: "id", Value: "1"}}
+		h.UpdateTask(ctx)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 }
 
 func TestTaskHandler_DeleteTask(t *testing.T) {
@@ -223,5 +244,15 @@ func TestTaskHandler_DeleteTask(t *testing.T) {
 		h.DeleteTask(ctx)
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+
+	t.Run("DBエラー", func(t *testing.T) {
+		h := handler.NewTaskHandler(&errTaskUsecase{err: errors.New("db error")})
+
+		ctx, w := newTaskContext("DELETE", "/tasks/1", "")
+		ctx.Params = gin.Params{{Key: "id", Value: "1"}}
+		h.DeleteTask(ctx)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 }
