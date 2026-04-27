@@ -4,6 +4,18 @@ import (
 	"github.com/MovingPointP/go-task-api/internal/domain/entity"
 )
 
+type errTaskUsecase struct{ err error }
+
+func (e *errTaskUsecase) Create(userID uint, title, description string) (*entity.Task, error) {
+	return nil, e.err
+}
+func (e *errTaskUsecase) Get(taskID, userID uint) (*entity.Task, error)  { return nil, e.err }
+func (e *errTaskUsecase) GetAll(userID uint) ([]*entity.Task, error)     { return nil, e.err }
+func (e *errTaskUsecase) Update(taskID, userID uint, title, description string, completed bool) (*entity.Task, error) {
+	return nil, e.err
+}
+func (e *errTaskUsecase) Delete(taskID, userID uint) error { return e.err }
+
 type mockTaskUsecase struct {
 	tasks  map[uint]*entity.Task
 	nextID uint

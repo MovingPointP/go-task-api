@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/MovingPointP/go-task-api/internal/domain/entity"
 	"github.com/MovingPointP/go-task-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -87,6 +89,7 @@ func (h *TaskHandler) GetTasks(ctx *gin.Context) {
 // @Success     200 {object} entity.Task
 // @Failure     400 {object} map[string]string
 // @Failure     404 {object} map[string]string
+// @Failure     500 {object} map[string]string
 // @Router      /tasks/{id} [get]
 func (h *TaskHandler) GetTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
@@ -97,7 +100,11 @@ func (h *TaskHandler) GetTask(ctx *gin.Context) {
 
 	task, err := h.taskUsecase.Get(uint(taskID), getUserID(ctx))
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if errors.Is(err, entity.ErrTaskNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get task"})
 		return
 	}
 
@@ -115,6 +122,7 @@ func (h *TaskHandler) GetTask(ctx *gin.Context) {
 // @Success     200 {object} entity.Task
 // @Failure     400 {object} map[string]string
 // @Failure     404 {object} map[string]string
+// @Failure     500 {object} map[string]string
 // @Router      /tasks/{id} [put]
 func (h *TaskHandler) UpdateTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
@@ -131,7 +139,11 @@ func (h *TaskHandler) UpdateTask(ctx *gin.Context) {
 
 	task, err := h.taskUsecase.Update(uint(taskID), getUserID(ctx), req.Title, req.Description, req.Completed)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if errors.Is(err, entity.ErrTaskNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update task"})
 		return
 	}
 
@@ -147,6 +159,7 @@ func (h *TaskHandler) UpdateTask(ctx *gin.Context) {
 // @Success     204
 // @Failure     400 {object} map[string]string
 // @Failure     404 {object} map[string]string
+// @Failure     500 {object} map[string]string
 // @Router      /tasks/{id} [delete]
 func (h *TaskHandler) DeleteTask(ctx *gin.Context) {
 	taskID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
@@ -156,7 +169,11 @@ func (h *TaskHandler) DeleteTask(ctx *gin.Context) {
 	}
 
 	if err := h.taskUsecase.Delete(uint(taskID), getUserID(ctx)); err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if errors.Is(err, entity.ErrTaskNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete task"})
 		return
 	}
 
