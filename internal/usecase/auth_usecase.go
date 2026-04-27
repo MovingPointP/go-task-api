@@ -25,11 +25,11 @@ func NewAuthUsecase(userRepo repository.UserRepository) AuthUsecase {
 
 func (u *authUsecase) Register(email, password string) (*entity.User, string, error) {
 	// メールアドレスの重複チェック
-	exsisting, err := u.userRepo.FindByEmail(email)
+	existing, err := u.userRepo.FindByEmail(email)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to check email: %w", err)
 	}
-	if exsisting != nil {
+	if existing != nil {
 		return nil, "", entity.ErrEmailAlreadyInUse
 	}
 
